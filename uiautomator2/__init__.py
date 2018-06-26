@@ -948,6 +948,23 @@ class UIAutomatorServer(object):
             })
         else:
             self.jsonrpc.setAccessibilityPatterns({})
+        
+############################## Customized Functions ##############################
+    def is_at_home_state(self):
+        return self.jsonrpc.isAtHomeState()
+    
+    def send_account_with_message(self, account, message):
+        return self.jsonrpc.sendAccountWithMessage(account, message)
+
+    def send_message_to_contacts(self, message, contacts):
+        return self.jsonrpc.sendMessageToContacts(message, contacts)
+
+    def send_message_to_contact(self, message, contact):
+        return self.jsonrpc.sendMessageToContact(message, contact)
+
+    def add_contact(self, contact, message):
+        return self.jsonrpc.addContact(contact, message)
+###################################################################################
 
     def session(self, pkg_name, attach=False):
         """
