@@ -964,6 +964,15 @@ class UIAutomatorServer(object):
 
     def add_contact(self, contact, message):
         return self.jsonrpc.addContact(contact, message)
+    
+    def add_contact(self, contact, message):
+        return self.jsonrpc.addContact(contact, message)
+
+    def get_contact_details(self, searchKey):
+        return self.jsonrpc.getContactDetails(searchKey)
+    
+    def make_sure_at_home_state(self):
+        return self.jsonrpc.makeSureAtHomeState()
 ###################################################################################
 
     def session(self, pkg_name, attach=False):
