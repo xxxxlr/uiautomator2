@@ -971,8 +971,11 @@ class UIAutomatorServer(object):
     def get_contact_details(self, searchKey):
         return self.jsonrpc.getContactDetails(searchKey)
     
-    def make_sure_at_home_state(self):
-        return self.jsonrpc.makeSureAtHomeState()
+    def make_sure_at_wechat_home_state(self):
+        return self.jsonrpc.makeSureAtWechatHomeState()
+
+    def scroll_moment(self, backDays):
+        return self.jsonrpc.scrollMoment(backDays)
 ###################################################################################
 
     def session(self, pkg_name, attach=False):
