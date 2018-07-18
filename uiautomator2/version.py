@@ -25,3 +25,5 @@ __atx_agent_version__ = '0.3.3'
 # 0.1.4 phone remote control
 # 0.1.2 /download support
 # 0.1.1 minicap buildin
+
+__customized_apk_test_url__ = 'https://github.com/xxxxlr/android-uiautomator-server/releases/download/0.0.1/app-uiautomator-test.apk'
