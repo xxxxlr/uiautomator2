@@ -22,7 +22,7 @@ import requests
 
 import uiautomator2 as u2
 from uiautomator2 import adbutils
-from uiautomator2.version import __apk_version__, __atx_agent_version__
+from uiautomator2.version import __apk_version__, __atx_agent_version__, __customized_apk_test_url__
 
 
 def get_logger(name):
@@ -126,9 +126,12 @@ class Installer(adbutils.Adb):
         path = cache_download(url)
         self.push(path, '/data/local/tmp/minitouch', 0o755)
 
-    def install_uiautomator_apk(self, apk_version, reinstall=False):
+    def install_uiautomator_apk(self, apk_version, reinstall=False, customized_apk_version = False):
         app_url = 'https://github.com/openatx/android-uiautomator-server/releases/download/%s/app-uiautomator.apk' % apk_version
         app_test_url = 'https://github.com/openatx/android-uiautomator-server/releases/download/%s/app-uiautomator-test.apk' % apk_version
+        if customized_apk_version:
+            app_test_url = __customized_apk_test_url__
+
         pkg_info = self.package_info('com.github.uiautomator')
         test_pkg_info = self.package_info('com.github.uiautomator.test')
         # For test_pkg_info has no versionName or versionCode
@@ -247,7 +250,8 @@ class MyFire(object):
              reinstall=False,
              ignore_apk_check=False,
              proxy=None,
-             serial=None):
+             serial=None,
+             customized_apk_version=False):
         if verbose:
             log.setLevel(logging.DEBUG)
         if server:
@@ -270,7 +274,7 @@ class MyFire(object):
             for serial in valid_serials:
                 self._init_with_serial(serial, server, apk_version,
                                        agent_version, reinstall,
-                                       ignore_apk_check)
+                                       ignore_apk_check, customized_apk_version)
             # if len(valid_serials) > 1:
             #     log.warning(
             #         "More then 1 device detected, you must specify android serial"
@@ -279,16 +283,16 @@ class MyFire(object):
             # serial = valid_serials[0]
         else:
             self._init_with_serial(serial, server, apk_version, agent_version,
-                                   reinstall, ignore_apk_check)
+                                   reinstall, ignore_apk_check, customized_apk_version)
 
     def _init_with_serial(self, serial, server, apk_version, agent_version,
-                          reinstall, ignore_apk_check):
+                          reinstall, ignore_apk_check, customized_apk_version):
         log.info("Device(%s) initialing ...", serial)
         ins = Installer(serial)
         ins.server_addr = server
         ins.install_minicap()
         ins.install_minitouch()
-        ins.install_uiautomator_apk(apk_version, reinstall)
+        ins.install_uiautomator_apk(apk_version, reinstall, customized_apk_version)
         ins.install_atx_agent(agent_version, reinstall)
         if not ignore_apk_check:
             ins.check_apk_installed(apk_version)
