@@ -131,6 +131,7 @@ class Installer(adbutils.Adb):
         app_test_url = 'https://github.com/openatx/android-uiautomator-server/releases/download/%s/app-uiautomator-test.apk' % apk_version
         if use_customized_apk_version:
             log.info('use_customized_apk_version True')
+            # NOTE: have to use both version with the same signed store key otherwise, atx-agent log shows test.apk can not control .apk
             app_test_url = __customized_apk_test_url__
             app_url = __customized_apk_url__
 
