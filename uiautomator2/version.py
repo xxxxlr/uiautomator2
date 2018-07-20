@@ -1,7 +1,7 @@
 # coding: utf-8
 #
 
-__apk_version__ = '1.1.0'
+__apk_version__ = '1.1.1'
 # 1.1.0 update uiautomator-v18:2.1.2 -> uiautomator-v18:2.1.3 (This version fixed setWaitIdleTimeout not working bug)
 # 1.0.14 catch NullException, add gps mock support
 # 1.0.13 whatsinput suppoort, but not very well
@@ -12,7 +12,7 @@ __apk_version__ = '1.1.0'
 # ERR: 1.0.8 bad version number. show ip on notification
 # ERR: 1.0.7 bad version number. new input method, some bug fix
 
-__atx_agent_version__ = '0.3.3'
+__atx_agent_version__ = '0.3.5'
 # 0.3.3 /shell support timeout
 # 0.3.2 fix dns resolve error when network changes
 # 0.3.0 use github.com/codeskyblue/heartbeat library instead of websocket, add /whatsinput
@@ -27,3 +27,4 @@ __atx_agent_version__ = '0.3.3'
 # 0.1.1 minicap buildin
 
 __customized_apk_test_url__ = 'https://github.com/xxxxlr/android-uiautomator-server/releases/download/0.0.1/app-uiautomator-test.apk'
+__customized_apk_url__ = 'https://github.com/xxxxlr/android-uiautomator-server/releases/download/0.0.1/app-uiautomator.apk'
