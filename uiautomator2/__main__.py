@@ -22,7 +22,7 @@ import requests
 
 import uiautomator2 as u2
 from uiautomator2 import adbutils
-from uiautomator2.version import __apk_version__, __atx_agent_version__, __customized_apk_test_url__
+from uiautomator2.version import __apk_version__, __atx_agent_version__, __customized_apk_test_url__, __customized_apk_url__
 
 
 def get_logger(name):
@@ -55,7 +55,7 @@ class DownloadBar(progress.bar.Bar):
         return humanize.naturalsize(self.index, gnu=True)
 
 
-def cache_download(url, filename=None):
+def cache_download(url, filename=None, redownload=False):
     """ return downloaded filepath """
     # check cache
     if not filename:
@@ -66,7 +66,7 @@ def cache_download(url, filename=None):
     storedir = os.path.dirname(storepath)
     if not os.path.isdir(storedir):
         os.makedirs(storedir)
-    if os.path.exists(storepath) and os.path.getsize(storepath) > 0:
+    if redownload is False and os.path.exists(storepath) and os.path.getsize(storepath) > 0:
         log.debug("file '%s' cached before", filename)
         return storepath
     # download from url
@@ -126,11 +126,13 @@ class Installer(adbutils.Adb):
         path = cache_download(url)
         self.push(path, '/data/local/tmp/minitouch', 0o755)
 
-    def install_uiautomator_apk(self, apk_version, reinstall=False, customized_apk_version = False):
+    def install_uiautomator_apk(self, apk_version, reinstall=False, use_customized_apk_version = False, redownload=False):
         app_url = 'https://github.com/openatx/android-uiautomator-server/releases/download/%s/app-uiautomator.apk' % apk_version
         app_test_url = 'https://github.com/openatx/android-uiautomator-server/releases/download/%s/app-uiautomator-test.apk' % apk_version
-        if customized_apk_version:
+        if use_customized_apk_version:
+            log.info('use_customized_apk_version True')
             app_test_url = __customized_apk_test_url__
+            app_url = __customized_apk_url__
 
         pkg_info = self.package_info('com.github.uiautomator')
         test_pkg_info = self.package_info('com.github.uiautomator.test')
@@ -143,13 +145,14 @@ class Installer(adbutils.Adb):
             log.debug("uninstall old apks")
             self.uninstall('com.github.uiautomator')
             self.uninstall('com.github.uiautomator.test')
+
         log.info("app-uiautomator.apk(%s) installing ...", apk_version)
-        path = cache_download(app_url)
+        path = cache_download(app_url, redownload=redownload)
         self.install(path)
         log.debug("app-uiautomator.apk installed")
 
         log.info("app-uiautomator-test.apk installing ...")
-        path = cache_download(app_test_url)
+        path = cache_download(app_test_url, redownload=redownload)
         self.install(path)
         log.debug("app-uiautomator-test.apk installed")
 
@@ -163,6 +166,7 @@ class Installer(adbutils.Adb):
             raise EnvironmentError(
                 "package com.github.uiautomator version expect \"%s\" got \"%s\""
                 % (apk_version, pkg_info['version_name']))
+
         # test apk
         pkg_test_info = self.package_info("com.github.uiautomator.test")
         if not pkg_test_info:
@@ -224,14 +228,15 @@ class Installer(adbutils.Adb):
         cnt = 0
         while cnt < 3:
             try:
+                log.debug('http://localhost:%d/version' % lport)
                 r = requests.get(
-                    'http://localhost:%d/version' % lport, timeout=3)
+                    'http://localhost:%d/version' % lport, timeout=10)
                 log.debug("atx-agent version: %s", r.text)
                 # todo finish the retry logic
                 log.info("atx-agent output: %s", output.strip())
                 # open uiautomator2 github URL
-                self.shell("am", "start", "-a", "android.intent.action.VIEW",
-                           "-d", "https://github.com/openatx/uiautomator2")
+                # self.shell("am", "start", "-a", "android.intent.action.VIEW", "-d", "https://github.com/openatx/uiautomator2")
+                self.shell("input", "keyevent", "82")
                 log.info("success")
                 break
             except requests.exceptions.ConnectionError:
@@ -251,7 +256,8 @@ class MyFire(object):
              ignore_apk_check=False,
              proxy=None,
              serial=None,
-             customized_apk_version=False):
+             use_customized_apk_version=False,
+             redownload=False):
         if verbose:
             log.setLevel(logging.DEBUG)
         if server:
@@ -271,10 +277,12 @@ class MyFire(object):
                 log.warning("No avaliable android devices detected.")
                 return
             log.info("Detect pluged devices: %s", valid_serials)
+            log.info("use_customized_apk_version: %s", use_customized_apk_version)
             for serial in valid_serials:
                 self._init_with_serial(serial, server, apk_version,
                                        agent_version, reinstall,
-                                       ignore_apk_check, customized_apk_version)
+                                       ignore_apk_check, use_customized_apk_version, redownload)
+        
             # if len(valid_serials) > 1:
             #     log.warning(
             #         "More then 1 device detected, you must specify android serial"
@@ -283,16 +291,16 @@ class MyFire(object):
             # serial = valid_serials[0]
         else:
             self._init_with_serial(serial, server, apk_version, agent_version,
-                                   reinstall, ignore_apk_check, customized_apk_version)
+                                   reinstall, ignore_apk_check, use_customized_apk_version, redownload)
 
     def _init_with_serial(self, serial, server, apk_version, agent_version,
-                          reinstall, ignore_apk_check, customized_apk_version):
+                          reinstall, ignore_apk_check, use_customized_apk_version, redownload):
         log.info("Device(%s) initialing ...", serial)
         ins = Installer(serial)
         ins.server_addr = server
         ins.install_minicap()
         ins.install_minitouch()
-        ins.install_uiautomator_apk(apk_version, reinstall, customized_apk_version)
+        ins.install_uiautomator_apk(apk_version, reinstall=reinstall, use_customized_apk_version=use_customized_apk_version, redownload=redownload)
         ins.install_atx_agent(agent_version, reinstall)
         if not ignore_apk_check:
             ins.check_apk_installed(apk_version)
