@@ -973,9 +973,14 @@ class UIAutomatorServer(object):
     
     def make_sure_at_wechat_home_state(self):
         return self.jsonrpc.makeSureAtWechatHomeState()
+    
     # 10 hours as default value timeout
     def scroll_moment(self, backDays, jsonrpc_server_to_cellphone_uiautomater_link_http_timeout=3600*10):
         return self.jsonrpc.scrollMoment(backDays, http_timeout=jsonrpc_server_to_cellphone_uiautomater_link_http_timeout)
+    
+    # 10 mins as default value timeout
+    def relogin(self, phoneNumber, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*10):
+        return self.jsonrpc.relogin(phoneNumber, http_timeout=jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
 ###################################################################################
 
     def session(self, pkg_name, attach=False):
