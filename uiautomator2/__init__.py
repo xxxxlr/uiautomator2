@@ -5,7 +5,7 @@
 
 atx-agent:ReverseProxy use http.DefaultTransport. Default Timeout: 30s
 
-|-- Dial --|-- TLS handshake --|-- Request --|-- Resp.headers --|-- Respose.body --|
+|-- Dial --|-- TLS handshake --|-- Request --|-- Resp.headers --|-- RespFose.body --|
 |------------------------------ http.Client.Timeout -------------------------------|
 
 Refs:
@@ -981,6 +981,11 @@ class UIAutomatorServer(object):
     # 10 mins as default value timeout
     def relogin(self, phoneNumber, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*10):
         return self.jsonrpc.relogin(phoneNumber, http_timeout=jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
+    
+    # 30 mins as default value timeout since it might have multiple contacts
+    def download_original_images_from_contacts(self, contacts, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*30):
+        return self.jsonrpc.downloadOriginalImagesFromContacts(contacts, http_timeout = jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
+
 ###################################################################################
 
     def session(self, pkg_name, attach=False):
