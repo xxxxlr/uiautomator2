@@ -5,7 +5,7 @@
 
 atx-agent:ReverseProxy use http.DefaultTransport. Default Timeout: 30s
 
-|-- Dial --|-- TLS handshake --|-- Request --|-- Resp.headers --|-- RespFose.body --|
+|-- Dial --|-- TLS handshake --|-- Request --|-- Resp.headers --|-- Respose.body --|
 |------------------------------ http.Client.Timeout -------------------------------|
 
 Refs:
@@ -434,6 +434,37 @@ class UIAutomatorServer(object):
             r = self._reqsess.get(self.path2url('/ping'), timeout=2)
             if r.status_code != 200:
                 return False
+            r = self._reqsess.post(
+                self.path2url('/jsonrpc/0'),
+                data=json.dumps({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "deviceInfo"
+                }),
+                timeout=2)
+            if r.status_code != 200:
+                return False
+            if r.json().get('error'):
+                return False
+            return True
+        except requests.exceptions.ReadTimeout:
+            return False
+        except EnvironmentError:
+            return False
+
+    def check_alive_atx(self):
+        try:
+            r = self._reqsess.get(self.path2url('/ping'), timeout=2)
+            if r.status_code != 200:
+                return False
+            return True
+        except requests.exceptions.ReadTimeout:
+            return False
+        except EnvironmentError:
+            return False
+
+    def check_alive_uiautomator(self):
+        try:
             r = self._reqsess.post(
                 self.path2url('/jsonrpc/0'),
                 data=json.dumps({
@@ -975,17 +1006,15 @@ class UIAutomatorServer(object):
         return self.jsonrpc.makeSureAtWechatHomeState()
     
     # 10 hours as default value timeout
-    def scroll_moment(self, backDays, jsonrpc_server_to_cellphone_uiautomater_link_http_timeout=3600*10):
-        return self.jsonrpc.scrollMoment(backDays, http_timeout=jsonrpc_server_to_cellphone_uiautomater_link_http_timeout)
+    def scroll_moment(self, backDays, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=3600*10):
+        return self.jsonrpc.scrollMoment(backDays, http_timeout=jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
     
     # 10 mins as default value timeout
     def relogin(self, phoneNumber, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*10):
         return self.jsonrpc.relogin(phoneNumber, http_timeout=jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
-    
-    # 30 mins as default value timeout since it might have multiple contacts
-    def download_original_images_from_contacts(self, contacts, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*30):
-        return self.jsonrpc.downloadOriginalImagesFromContacts(contacts, http_timeout = jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
 
+    def download_original_images_from_contacts(self, contacts, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*10):
+        return self.jsonrpc.downloadOriginalImagesFromContacts(contacts, http_timeout = jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
 ###################################################################################
 
     def session(self, pkg_name, attach=False):
