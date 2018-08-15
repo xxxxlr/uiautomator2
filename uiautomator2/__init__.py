@@ -354,7 +354,7 @@ class UIAutomatorServer(object):
                            **kwargs):  # method, params=[], http_timeout=60):
         try:
             return self.jsonrpc_call(*args, **kwargs)
-        except (GatewayError, UiAutomationNotConnectedError):
+        except (UiAutomationNotConnectedError):
             warnings.warn(
                 "uiautomator2 is not reponding, restart uiautomator2 automatically",
                 RuntimeWarning,
