@@ -1013,8 +1013,8 @@ class UIAutomatorServer(object):
     def relogin(self, phoneNumber, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*10):
         return self.jsonrpc.relogin(phoneNumber, http_timeout=jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
 
-    def download_original_images_from_contacts(self, contacts, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*10):
-        return self.jsonrpc.downloadOriginalImagesFromContacts(contacts, http_timeout = jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
+    def download_original_images_from_contact(self, contact, jsonrpc_server_to_cellphone_uiautomator_link_http_timeout=60*10):
+        return self.jsonrpc.downloadOriginalImagesFromContact(contact, http_timeout = jsonrpc_server_to_cellphone_uiautomator_link_http_timeout)
 ###################################################################################
 
     def session(self, pkg_name, attach=False):
