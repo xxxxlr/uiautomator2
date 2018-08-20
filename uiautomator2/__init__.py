@@ -993,11 +993,8 @@ class UIAutomatorServer(object):
     def send_message_to_contact(self, message, contact):
         return self.jsonrpc.sendMessageToContact(message, contact)
 
-    def add_contact(self, contact, message):
-        return self.jsonrpc.addContact(contact, message)
-    
-    def add_contact(self, contact, message):
-        return self.jsonrpc.addContact(contact, message)
+    def add_contact(self, contact, message, assignedNickname):
+        return self.jsonrpc.addContact(contact, message, assignedNickname)
 
     def get_contact_details(self, searchKey):
         return self.jsonrpc.getContactDetails(searchKey)
